@@ -43,7 +43,7 @@ export class ChatboxComponent {
     this.sendData = data.sendData;
     this.currentStatus = data.currentStatus;
     this.currentMethod = data.currentMethod;
-    this.endpoint = 'http://localhost:8082/v1/admin/ddpglobalvariables'
+    this.endpoint = 'http://localhost:8080/v1/admin/ddpglobalvariables'
   }
 
   // show the message
@@ -347,7 +347,23 @@ export class ChatboxComponent {
               content: JSON.stringify(res),
               actions: false,
               submitActions: false
-            })
+            });
+
+            this.scrollToBottom();
+          }, (error) => {
+            let message;
+            if (error.status == 400) {
+              message = error?.error?.error?.description;
+            } else {
+              message = 'Something went wrong. Please try again.'
+            }
+
+            this.messages.push({
+              type: 'bot-message',
+              content: message,
+              actions: false,
+              submitActions: false
+            });
           })
           break;
         case 'delete':
@@ -357,7 +373,23 @@ export class ChatboxComponent {
               content: JSON.stringify(res),
               actions: false,
               submitActions: false
-            })
+            });
+
+            this.scrollToBottom();
+          }, (error) => {
+            let message;
+            if (error.status == 400) {
+              message = error?.error?.error?.description;
+            } else {
+              message = 'Something went wrong. Please try again.'
+            }
+
+            this.messages.push({
+              type: 'bot-message',
+              content: message,
+              actions: false,
+              submitActions: false
+            });
           })
           break;
         case 'update':
@@ -367,10 +399,28 @@ export class ChatboxComponent {
               content: JSON.stringify(res),
               actions: false,
               submitActions: false
-            })
+            });
+
+            this.scrollToBottom();
+          }, (error) => {
+            let message;
+            if (error.status == 400) {
+              message = error?.error?.error?.description;
+            } else {
+              message = 'Something went wrong. Please try again.'
+            }
+
+            this.messages.push({
+              type: 'bot-message',
+              content: message,
+              actions: false,
+              submitActions: false
+            });
           })
           break;
       }
+
+      this.scrollToBottom();
     } else {
       this.messages.push({
         type: 'bot-message',
@@ -387,7 +437,7 @@ export class ChatboxComponent {
   }
 
   createNewGlobalVariable(data: any) {
-    return this.http.post(this.endpoint, data)
+    return this.http.post(this.endpoint, data);
   }
 
   deleteExistGlobalVariable(data: any) {
@@ -401,7 +451,7 @@ export class ChatboxComponent {
   scrollToBottom() {
     setTimeout(() => {
       document.querySelector('.chat-content').scrollTo(0, document.querySelector('.chat-content').scrollHeight + 50)
-    }, 0);
+    }, 100);
   }
 
   openHelpDialog() {
