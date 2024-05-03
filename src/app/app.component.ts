@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { HttpClient } from '@angular/common/http';
+
 import { ChatboxComponent } from './chatbox/chatbox.component';
 import { Message } from './utils';
 
@@ -15,22 +17,47 @@ export class AppComponent {
   currentStatus: string;
   currentMethod: string;
 
-  constructor(private _bottomSheet: MatBottomSheet) {
-    this.Messages = [
-      {
-        type: 'bot-message',
-        content: 'Welcome to our admin panel! <br /> How can I help you?',
-        actions: false,
-        submitActions: false
-      },
-      {
-        type: 'bot-message',
-        content: 'I can provide these options. Please choose one.',
-        actions: true,
-        submitActions: false
-      }
-    ];
+  constructor(
+    private _bottomSheet: MatBottomSheet,
+    private http: HttpClient,
+  ) {
     this.sendData = {};
+
+    this.http.get('http://localhost:8082/getUserDetails').subscribe(res => {
+      this.Messages = [
+        {
+          type: 'bot-message',
+          content: `Hi, ${res['fullName']} <br />
+                    Welcome to EDSO Chat Bot!! <br />
+                    How can I help you?`,
+          actions: false,
+          submitActions: false
+        },
+        {
+          type: 'bot-message',
+          content: 'I can provide these options. Please choose one.',
+          actions: true,
+          submitActions: false
+        }
+      ];
+    }, (error) => {
+      console.log(error, "erro")
+      this.Messages = [
+        {
+          type: 'bot-message',
+          content: `Welcome to EDSO Chat Bot!! <br />
+                    How can I help you?`,
+          actions: false,
+          submitActions: false
+        },
+        {
+          type: 'bot-message',
+          content: 'I can provide these options. Please choose one.',
+          actions: true,
+          submitActions: false
+        }
+      ];
+    })
   };
 
   openBottomSheet(event: Event): void {

@@ -43,7 +43,7 @@ export class ChatboxComponent {
     this.sendData = data.sendData;
     this.currentStatus = data.currentStatus;
     this.currentMethod = data.currentMethod;
-    this.endpoint = 'http://localhost:8080/v1/admin/ddpglobalvariables'
+    this.endpoint = 'http://localhost:8082/v1/admin/ddpglobalvariables';
   }
 
   // show the message
