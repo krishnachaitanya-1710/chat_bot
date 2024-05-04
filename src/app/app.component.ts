@@ -27,10 +27,10 @@ export class AppComponent {
       this.Messages = [
         {
           type: 'bot-message',
-          content: `Hi, ${res['fullName']} <br />
+          content: `Hi, <span style='text-transform: capitalize;'>${res['fullName']}</span> <br />
                     Welcome to EDSO Chat Bot!! <br />
                     How can I help you?`,
-          actions: false,
+          actions: true,
           submitActions: false
         },
         {
@@ -41,7 +41,6 @@ export class AppComponent {
         }
       ];
     }, (error) => {
-      console.log(error, "erro")
       this.Messages = [
         {
           type: 'bot-message',
