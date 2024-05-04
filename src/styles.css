@@ -4,11 +4,12 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mat-bottom-sheet-container {
-    width: 400px !important;
     min-width: auto !important;
     position: absolute !important;
     right: 0px;
     bottom: 0px;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .mat-fab {

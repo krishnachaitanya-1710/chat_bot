@@ -12,10 +12,12 @@ import { Message } from './utils';
 })
 export class AppComponent {
   title = 'chatbot';
-  Messages: Message[];
+  Messages: Message[] = [];
   sendData: any;
   currentStatus: string;
   currentMethod: string;
+  loading: Boolean = true;
+  endpoint: string = 'http://localhost:8080';
 
   constructor(
     private _bottomSheet: MatBottomSheet,
@@ -23,40 +25,52 @@ export class AppComponent {
   ) {
     this.sendData = {};
 
-    this.http.get('http://localhost:8082/getUserDetails').subscribe(res => {
-      this.Messages = [
-        {
-          type: 'bot-message',
-          content: `Hi, <span style='text-transform: capitalize;'>${res['fullName']}</span> <br />
-                    Welcome to EDSO Chat Bot!! <br />
-                    How can I help you?`,
-          actions: false,
-          submitActions: false
-        },
-        {
-          type: 'bot-message',
-          content: 'I can provide these options. Please choose one.',
-          actions: true,
-          submitActions: false
-        }
-      ];
-    }, (error) => {
-      this.Messages = [
-        {
-          type: 'bot-message',
-          content: `Welcome to EDSO Chat Bot!! <br />
-                    How can I help you?`,
-          actions: false,
-          submitActions: false
-        },
-        {
-          type: 'bot-message',
-          content: 'I can provide these options. Please choose one.',
-          actions: true,
-          submitActions: false
-        }
-      ];
-    })
+    this.http.get(`${this.endpoint}/getUserDetails`)
+      .subscribe((res: any) => {
+        this.Messages = [
+          {
+            type: 'bot-message',
+            content: `Hi, <span style='text-transform: capitalize;'>${res.fullName}</span> <br />
+                      Welcome to EDSO Chat Bot!! <br />
+                      How can I help you?`,
+            actions: false,
+            submitActions: false
+          },
+          {
+            type: 'bot-message',
+            content: 'I can provide these options. Please choose one.',
+            actions: true,
+            submitActions: false
+          }
+        ];
+
+        // this.http.get(`${this.endpoint}/chats?employeeId=${res.employeeId}`)
+        //   .subscribe((result: any) => {
+        //     console.log('result:', result);
+        //     this.loading = false;
+        //   }, (error) => {
+        //     this.loading = false;
+        //   });
+          
+          this.loading = false;
+      }, (error) => {
+        this.Messages = [
+          {
+            type: 'bot-message',
+            content: `Welcome to EDSO Chat Bot!! <br />
+                      How can I help you?`,
+            actions: false,
+            submitActions: false
+          },
+          {
+            type: 'bot-message',
+            content: 'I can provide these options. Please choose one.',
+            actions: true,
+            submitActions: false
+          }
+        ];
+        this.loading = false;
+      })
   };
 
   openBottomSheet(event: Event): void {
@@ -67,7 +81,8 @@ export class AppComponent {
         messages: this.Messages,
         sendData: this.sendData,
         currentStatus: this.currentStatus,
-        currentMethod: this.currentMethod
+        currentMethod: this.currentMethod,
+        endpoint: this.endpoint
       }
     });
   };

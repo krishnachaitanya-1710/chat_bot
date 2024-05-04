@@ -25,10 +25,15 @@ import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-co
 export class ChatboxComponent {
   message: string;
   messages: Message[];
+  allMessages: Message[];
   endpoint: string;
   sendData: any;
   currentStatus: string;
   currentMethod: string;
+  employeeId: string;
+  chatBoxWidth: string;
+  chatBoxHeight: string;
+  minium: Boolean;
   labels = labels;
   keywords = keywords;
 
@@ -38,17 +43,25 @@ export class ChatboxComponent {
     private sanitizer: DomSanitizer,
     private http: HttpClient,
   ) {
+    this.endpoint = data.endpoint;
+
     this.message = '';
-    this.messages = data.messages;
+    this.allMessages = data.messages;
     this.sendData = data.sendData;
     this.currentStatus = data.currentStatus;
     this.currentMethod = data.currentMethod;
-    this.endpoint = 'http://localhost:8082/v1/admin/ddpglobalvariables';
+    this.employeeId = data.employeeId;
+
+    this.chatBoxWidth = '400px';
+    this.chatBoxHeight = '400px';
+    this.minium = false;
   }
 
   // show the message
   sendMessage(): void {
     if (!this.message.trim()) return;
+
+    this.messages = [];
 
     this.messages.push({
       type: 'self-message',
@@ -113,13 +126,20 @@ export class ChatboxComponent {
         break;
     }
 
+    this.allMessages.push(...this.messages);
     this.message = '';
     this.scrollToBottom();
+    // this.saveMessage(this.messages)
+    //   .subscribe((result: any) => {
+    //   }, error => {
+    //     console.log(error);
+    //   });
+    
   }
 
   // select the provide methods
   selectMethod(action: string): void {
-    this.messages.push({
+    this.allMessages.push({
       type: 'self-message',
       content: this.labels[action],
       actions: false,
@@ -127,7 +147,7 @@ export class ChatboxComponent {
     });
 
     setTimeout(() => {
-      this.messages.push({
+      this.allMessages.push({
         type: 'bot-message',
         content: 'Please enter a Property Name',
         actions: false,
@@ -174,15 +194,23 @@ export class ChatboxComponent {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  // method check
-  checkMethod(word: string): Boolean {
-    keywords[word].forEach(keyword => {
-      if (this.message.indexOf(keyword) === -1) return true;
-    });
-    return false;
+  scrollToBottom() {
+    setTimeout(() => {
+      document.querySelector('.chat-content').scrollTo(0, document.querySelector('.chat-content').scrollHeight + 50)
+    }, 100);
   }
 
-  // handle unrecognized commands
+  toggleMinimize() {
+    this.minium = !this.minium;
+  }
+
+  toggleResize() {
+    this.chatBoxWidth = this.chatBoxWidth === '400px' ? '600px' : '400px';
+    this.chatBoxHeight = this.chatBoxHeight === '400px' ? '600px' : '400px';
+  }
+
+
+  // handle text recognizations
   handleUnrecognized(text: string): Boolean {
     const parsedText = nlp(text).sentences().json();
     if (!parsedText[0].sentence.verb) {
@@ -198,7 +226,6 @@ export class ChatboxComponent {
     return false;
   }
 
-  // handle unsupport commands
   handleUnsupport(text: string): Boolean {
     let keywords = { ...this.keywords, variable: ['global', 'variable', 'value'] };
     let foundKeyword = null;
@@ -326,6 +353,7 @@ export class ChatboxComponent {
     });
   }
 
+  // Submit and api calls
   onSubmit(bool: Boolean) {
     if (bool) {
       for (const key in keywords) {
@@ -422,7 +450,7 @@ export class ChatboxComponent {
 
       this.scrollToBottom();
     } else {
-      this.messages.push({
+      this.allMessages.push({
         type: 'bot-message',
         content: 'Sorry, It seems I have missed something. Please try again',
         actions: true,
@@ -437,22 +465,22 @@ export class ChatboxComponent {
   }
 
   createNewGlobalVariable(data: any) {
-    return this.http.post(this.endpoint, data);
+    return this.http.post(`${this.endpoint}/v1/admin/ddpglobalvariables`, data);
   }
 
   deleteExistGlobalVariable(data: any) {
-    return this.http.delete(this.endpoint, data);
+    return this.http.delete(`${this.endpoint}/v1/admin/ddpglobalvariables`, data);
   }
 
   updateExistGlobalVariable(data: any) {
-    return this.http.put(this.endpoint, data);
+    return this.http.put(`${this.endpoint}/v1/admin/ddpglobalvariables`, data);
   }
 
-  scrollToBottom() {
-    setTimeout(() => {
-      document.querySelector('.chat-content').scrollTo(0, document.querySelector('.chat-content').scrollHeight + 50)
-    }, 100);
+  saveMessage(data: Message[]) {
+    return this.http.post(`${this.endpoint}/chats`, data);
   }
+
+  // opening modals
 
   openHelpDialog() {
     const dialogRef = this.dialog.open(HelpDialogComponent);
@@ -461,13 +489,13 @@ export class ChatboxComponent {
   openDeleteConfirmDialog() {
     const dialogRef = this.dialog.open(DeleteConfirmDialogComponent, {
       data: {
-        messages: this.messages
+        messages: this.allMessages
       }
     });
 
     dialogRef.componentInstance.deleteConfirmed.subscribe(() => {
       // Delete logic here
-      this.messages = [];
+      this.allMessages = [];
     });
   }
 }
