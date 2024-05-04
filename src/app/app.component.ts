@@ -30,7 +30,7 @@ export class AppComponent {
           content: `Hi, <span style='text-transform: capitalize;'>${res['fullName']}</span> <br />
                     Welcome to EDSO Chat Bot!! <br />
                     How can I help you?`,
-          actions: true,
+          actions: false,
           submitActions: false
         },
         {
