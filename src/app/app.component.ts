@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,29 +10,32 @@ import { Message } from './utils';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'chatbot';
   Messages: Message[] = [];
   sendData: any;
   currentStatus: string;
   currentMethod: string;
   loading: Boolean = true;
-  endpoint: string = 'http://localhost:8080';
+  endpoint: string = 'http://localhost:8082';
+  lanId: string;
 
   constructor(
     private _bottomSheet: MatBottomSheet,
     private http: HttpClient,
   ) {
     this.sendData = {};
+  };
 
+  ngOnInit(): void {
     this.http.get(`${this.endpoint}/getUserDetails`)
       .subscribe((res: any) => {
         this.Messages = [
           {
             type: 'bot-message',
             content: `Hi, <span style='text-transform: capitalize;'>${res.fullName}</span> <br />
-                      Welcome to EDSO Chat Bot!! <br />
-                      How can I help you?`,
+                    Welcome to EDSO Chat Bot!! <br />
+                    How can I help you?`,
             actions: false,
             submitActions: false
           },
@@ -51,14 +54,15 @@ export class AppComponent {
         //   }, (error) => {
         //     this.loading = false;
         //   });
-          
-          this.loading = false;
+
+        this.lanId = res.lanid;
+        this.loading = false;
       }, (error) => {
         this.Messages = [
           {
             type: 'bot-message',
             content: `Welcome to EDSO Chat Bot!! <br />
-                      How can I help you?`,
+                    How can I help you?`,
             actions: false,
             submitActions: false
           },
@@ -69,9 +73,10 @@ export class AppComponent {
             submitActions: false
           }
         ];
+
         this.loading = false;
       })
-  };
+  }
 
   openBottomSheet(event: Event): void {
     event.preventDefault();
@@ -82,7 +87,8 @@ export class AppComponent {
         sendData: this.sendData,
         currentStatus: this.currentStatus,
         currentMethod: this.currentMethod,
-        endpoint: this.endpoint
+        endpoint: this.endpoint,
+        lanId: this.lanId
       }
     });
   };

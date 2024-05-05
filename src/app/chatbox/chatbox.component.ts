@@ -30,10 +30,12 @@ export class ChatboxComponent {
   sendData: any;
   currentStatus: string;
   currentMethod: string;
-  employeeId: string;
+  lanId: string;
+
   chatBoxWidth: string;
   chatBoxHeight: string;
   minium: Boolean;
+
   labels = labels;
   keywords = keywords;
 
@@ -50,7 +52,7 @@ export class ChatboxComponent {
     this.sendData = data.sendData;
     this.currentStatus = data.currentStatus;
     this.currentMethod = data.currentMethod;
-    this.employeeId = data.employeeId;
+    this.lanId = data.lanId;
 
     this.chatBoxWidth = '400px';
     this.chatBoxHeight = '400px';
@@ -129,12 +131,17 @@ export class ChatboxComponent {
     this.allMessages.push(...this.messages);
     this.message = '';
     this.scrollToBottom();
-    // this.saveMessage(this.messages)
-    //   .subscribe((result: any) => {
-    //   }, error => {
-    //     console.log(error);
-    //   });
     
+    // this.saveMessage(this.messages.map((message: any) => {
+    //   return { ...message, lanId: this.lanId }
+    // })).subscribe((result: string) => {
+    //   if (result === "Saved") {
+    //   } else if (result === 'Failed') {
+    //     alert('Failed');
+    //   }
+    // }, error => {
+    //   console.log(error);
+    // });
   }
 
   // select the provide methods
